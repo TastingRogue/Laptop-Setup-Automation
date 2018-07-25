@@ -10,10 +10,6 @@
     return $option
 }
 
-#Prueba
-#Test
-#Probe
-
 Function Add-ComputerToDomain(){ 
    <# Param( 
       [string]$DomainAccountName = $(throw "Parameter missing: -DomainAccountName DomainAccountName"),  
