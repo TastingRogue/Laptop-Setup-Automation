@@ -77,6 +77,7 @@ else
 # Run your code that needs to be elevated here
 $sw = menu
 
+
 switch($sw){
     
     1{
@@ -92,9 +93,31 @@ switch($sw){
     2{
         if((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain){
             Write-Host("Basic setup configuration selected.")
+            #Set Firewall inbaund action to allow in Domain, Private and Piblic
             Set-NetFirewallProfile -Name Domain -DefaultInboundAction Allow
             Set-NetFirewallProfile -Name Private -DefaultInboundAction Allow
             Set-NetFirewallProfile -Name Public -DefaultInboundAction Allow
+
+            #Enable Services
+            Set-Service -Name RpcLocator -StartupType Automatic
+            Start-Service RpcLocator
+            Restart-Service Winmgmt -Force
+
+            $RemoteLocator = Get-Service RpcLocator | Select-Object Name, StartType, Status
+            $WinManagemet = Get-Service Winmgmt | Select-Object Name, StartType, Status
+
+            Write-Host Remote Procedure Call RPC Locator
+            Write-Host -ForegroundColor Green ("Name       StartType  Status")
+            Write-Host -ForegroundColor Green ("----       ---------  ------")
+            Write-Host -ForegroundColor Green ($RemoteLocator.Name + " " + $RemoteLocator.StartType + " " + $RemoteLocator.Status)
+
+            Write-Host Windows Management Instrumentation
+            Write-Host -ForegroundColor Green ("Name    StartType  Status")
+            Write-Host -ForegroundColor Green ("----    ---------  ------")
+            Write-Host -ForegroundColor Green ($WinManagemet.Name + " " + $WinManagemet.StartType + " " + $WinManagemet.Status)
+
+
+            #Force policy update
             gpupdate /force  
         }
         else{
